@@ -1,9 +1,15 @@
 package com.learn.models;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity(name = "User1")
 public class User {
+    @Id
     String username;
     String password;
     String email;
+    String role;
 
     public User() {
     }
@@ -36,5 +42,13 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

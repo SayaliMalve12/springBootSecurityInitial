@@ -1,5 +1,7 @@
 package com.learn.config;
 
+import com.learn.models.CustomUserDetail;
+import com.learn.services.CusotmUserDetailService;
 import com.learn.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.proxy.NoOp;
@@ -30,47 +32,69 @@ public class MySecurityConfig {
 
     @Autowired
     UserService userService;
+    private CusotmUserDetailService cusotmUserDetailService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-       http
-               .csrf().disable()
-               .authorizeRequests()
+        //1. httpBasic
+//       http
+//               .csrf().disable()
+//               .authorizeRequests()
+////               .antMatchers("/public/**").permitAll()
+////               .antMatchers(HttpMethod.GET).permitAll()
+//               .antMatchers("/public/**").hasRole("ADMIN")
+//               .antMatchers("/users/**").hasRole("NORMAL")
+//               .anyRequest()
+//               .authenticated()
+//               .and()
+//               .httpBasic();
+
+        //2. FormLogin
+        http
+                .csrf().disable()
+                .authorizeRequests()
 //               .antMatchers("/public/**").permitAll()
 //               .antMatchers(HttpMethod.GET).permitAll()
-               .antMatchers("/public/**").hasRole("ADMIN")
-               .antMatchers("/users/**").hasRole("NORMAL")
-               .anyRequest()
-               .authenticated()
-               .and()
-               .httpBasic();
+                .antMatchers("/signin").permitAll()
+                .antMatchers("/public/**").hasRole("ADMIN")
+                .antMatchers("/users/**").hasRole("NORMAL")
+                .anyRequest()
+                .authenticated()
+                .and()
+                .formLogin()
+                .loginPage("/signin")
+                .loginProcessingUrl("/dologin")
+                .defaultSuccessUrl("/users/");
        return http.build();
     }
-//
+
 //    @Bean
 //    AuthenticationManager authenticationManager(AuthenticationManagerBuilder builder) throws Exception {
-//        return builder.inMemoryAuthentication().withUser("sayali").password("malve").roles("NORMAL")
-//                .and().withUser("chetan").password("gaikwad").roles("ADMIN").and().and().build();
+////        return builder.inMemoryAuthentication().withUser("sayali").password("malve").roles("NORMAL")
+////                .and().withUser("chetan").password("gaikwad").roles("ADMIN").and().and().build();
+//        return builder.userDetailsService(cusotmUserDetailService).passwordEncoder(passwordEncoder()).and().build();
 //    }
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withUsername("sayali")
-              //  .username("user")
-                .password(this.passwordEncoder().encode("malve"))
-                .roles("ADMIN")
-                .build();
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService() {
+//        UserDetails user = User.withUsername("sayali")
+//                .username("sayali")
+//                .password(this.passwordEncoder().encode("malve"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        UserDetails user2 = User.withUsername("chetan")
+//                .username("chetan")
+//                .password(this.passwordEncoder().encode("gaikwad"))
+//                .roles("NORMAL")
+//                .build();
+//        return new InMemoryUserDetailsManager(user, user2);
+//    }
 
-        UserDetails user2 = User.withUsername("chetan")
-                //  .username("user")
-                .password(this.passwordEncoder().encode("gaikwad"))
-                .roles("NORMAL")
-                .build();
-        return new InMemoryUserDetailsManager(user, user2);
-    }
-
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder(){
 //        return NoOpPasswordEncoder.getInstance();
         return new BCryptPasswordEncoder(10);
     }
+
+
 }
